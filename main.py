@@ -2,6 +2,7 @@ from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKe
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import random
 import os
+import asyncio
 
 # الإعدادات المخفية والأمان
 TOKEN = os.environ.get("BOT_TOKEN")
@@ -114,7 +115,7 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # =======================================================
-# 🛠️ إضافات السيرفر الوهمي لتشغيل البوت 24 ساعة على Render بدون توقف
+# 🛠️ سيرفر وهمي مخصص ومتوافق مع ريندر الجديد
 # =======================================================
 import http.server
 import socketserver
@@ -129,8 +130,7 @@ def run_dummy_server():
 threading.Thread(target=run_dummy_server, daemon=True).start()
 # =======================================================
 
-if __name__ == '__main__':
-    # التأكد من وجود التوكن قبل التشغيل لحماية السيستم
+async def main():
     if not TOKEN:
         raise ValueError("خطأ: لم يتم العثور على BOT_TOKEN في إعدادات Render!")
         
@@ -139,6 +139,20 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("stats", stats))
     app.add_handler(MessageHandler(filters.VIDEO & filters.CAPTION, save_video))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
+    
     print("بوت المقاطع (Maalak48) يعمل الآن..")
-    import asyncio
-    asyncio.run(app.run_polling())
+    
+    # تشغيل البوت يدوياً وبأمان لتجنب تعارض إصدار بايثون 3.14
+    await app.initialize()
+    await app.updater.start_polling(drop_pending_updates=True)
+    await app.start()
+    
+    # يخليه شغال للأبد بدون توقف
+    while True:
+        await asyncio.sleep(3600)
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        pass
