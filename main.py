@@ -114,25 +114,10 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_video(video=chosen_video)
 
 
-# =======================================================
-# 🛠️ سيرفر وهمي مخصص ومتوافق مع ريندر الجديد
-# =======================================================
-import http.server
-import socketserver
-import threading
-
-def run_dummy_server():
-    PORT = int(os.environ.get("PORT", 12000))
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        httpd.serve_forever()
-
-threading.Thread(target=run_dummy_server, daemon=True).start()
-# =======================================================
-
-async def main():
+# تشغيل البوت الرسمي بالخلفية كـ Worker
+def main():
     if not TOKEN:
-        raise ValueError("خطأ: لم يتم العثور على BOT_TOKEN في إعدادات Render!")
+        raise ValueError("خطأ: لم يتم العثور على BOT_TOKEN!")
         
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -140,19 +125,8 @@ async def main():
     app.add_handler(MessageHandler(filters.VIDEO & filters.CAPTION, save_video))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
     
-    print("بوت المقاطع (Maalak48) يعمل الآن..")
-    
-    # تشغيل البوت يدوياً وبأمان لتجنب تعارض إصدار بايثون 3.14
-    await app.initialize()
-    await app.updater.start_polling(drop_pending_updates=True)
-    await app.start()
-    
-    # يخليه شغال للأبد بدون توقف
-    while True:
-        await asyncio.sleep(3600)
+    print("بوت المقاطع (Maalak48) يعمل الآن بنجاح وبدون توقف..")
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        pass
+    main()
