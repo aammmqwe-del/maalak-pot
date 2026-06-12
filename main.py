@@ -140,5 +140,5 @@ if __name__ == '__main__':
     app.add_handler(MessageHandler(filters.VIDEO & filters.CAPTION, save_video))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
     print("بوت المقاطع (Maalak48) يعمل الآن..")
-    
-    app.run_polling(close_loop=False, drop_pending_updates=True)
+    import asyncio
+    asyncio.run(app.run_polling())
