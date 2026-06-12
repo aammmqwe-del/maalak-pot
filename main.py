@@ -121,7 +121,7 @@ import socketserver
 import threading
 
 def run_dummy_server():
-    PORT = int(os.environ.get("PORT", 10000))
+    PORT = int(os.environ.get("PORT", 12000))
     handler = http.server.SimpleHTTPRequestHandler
     with socketserver.TCPServer(("", PORT), handler) as httpd:
         httpd.serve_forever()
